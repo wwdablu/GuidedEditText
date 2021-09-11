@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="GuidedEditTextExt">
+
+        <attr name="inputWidth" format="dimension"/>
+        <attr name="inputHeight" format="dimension"/>
+        <attr name="inputType" format="enum">
+            <enum name="number" value="0"/>
+            <enum name="text" value="1"/>
+            <enum name="password" value="2"/>
+        </attr>
+        <attr name="inputTextSize" format="dimension"/>
+        <attr name="inputBackground" format="reference"/>
+
+        <attr name="guideBackgroundColor" format="color"/>
+        <attr name="guideBackgroundImage" format="reference"/>
+        <attr name="guideAnimate" format="boolean"/>
+
+    </declare-styleable>
+
+</resources>

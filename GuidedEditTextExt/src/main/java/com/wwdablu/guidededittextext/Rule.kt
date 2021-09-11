@@ -9,10 +9,6 @@ class Rule private constructor(iRule: IRule) {
 
     internal val ruleImpl = iRule
 
-    internal fun setStateTextColor(state: State, @ColorInt color: Int) {
-        stateTextColorMap[state] = color
-    }
-
     internal var notifyMode = Notify.Finish
     internal var stateTextColorMap = HashMap<State, @ColorInt Int>()
 

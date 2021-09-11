@@ -1,5 +1,6 @@
 package com.wwdablu.guidededittextext
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.Color
 import android.text.Editable
@@ -17,6 +18,7 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
     private val rulesContainer: LinearLayoutCompat = LinearLayoutCompat(context)
 
     private val ruleViewList = LinkedList<RuleView>()
+    private var animate: Boolean = true
 
     fun addRule(vararg rules: Rule) {
         for(rule: Rule in rules) {
@@ -51,13 +53,24 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
 
                     when(ruleView.rule.ruleImpl.follows(updatedText.toString())) {
                         IRule.State.Satisfied -> {
-                            rulesContainer.removeView(ruleView.view)
+
+                            if(animate) {
+                                ruleView.view.fadeOutAndRemoveFrom(rulesContainer)
+                            } else {
+                                rulesContainer.removeView(ruleView.view)
+                            }
+
                             ruleView.viewIsAdded = false
                         }
                         IRule.State.Unsatisfied,
                         IRule.State.PartiallySatisfied -> {
                             if(!ruleView.viewIsAdded) {
-                                rulesContainer.addView(ruleView.view)
+
+                                if(animate) {
+                                    ruleView.view.addAndFadeIn(rulesContainer)
+                                } else {
+                                    rulesContainer.addView(ruleView.view)
+                                }
                                 ruleView.viewIsAdded = true
                             }
                         }
@@ -73,6 +86,20 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
 
     init {
         orientation = VERTICAL
+
+        val attributes = context.theme.obtainStyledAttributes(attrs,
+            R.styleable.GuidedEditTextExt, 0, 0).run {
+
+            animate = getBoolean(R.styleable.GuidedEditTextExt_guideAnimate, true)
+
+            inputEditText.setBackgroundResource(getResourceId(
+                R.styleable.GuidedEditTextExt_inputBackground, R.drawable.rounded_corner))
+
+            rulesContainer.setBackgroundResource(getResourceId(
+                R.styleable.GuidedEditTextExt_guideBackgroundImage, R.drawable.guide_background))
+
+            this
+        }
 
         inputEditText.apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -96,16 +123,21 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
             id = generateViewId()
         }
 
-        this.apply {
-            addView(inputEditText)
-            addView(rulesContainer)
-        }
+        addView(inputEditText)
+        addView(rulesContainer)
+        attributes.recycle()
     }
 
     private fun createRuleView(rule: Rule) : View {
 
         return AppCompatTextView(context).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setPadding(
+                dipToPixel(8f).toInt(),
+                0,
+                dipToPixel(8f).toInt(),
+                0
+            )
             id = generateViewId()
             text = rule.ruleImpl.text(IRule.State.Unsatisfied)
             setTextColor(rule.stateTextColorMap[IRule.State.Unsatisfied] ?: Color.RED)
