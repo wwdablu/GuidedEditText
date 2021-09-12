@@ -1,16 +1,21 @@
 package com.wwdablu.guidededittextext
 
-import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.Color
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.InputType.*
+import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
-import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
+import com.wwdablu.guidededittextext.abstracts.TextChangeListener
+import com.wwdablu.guidededittextext.extensions.addTo
+import com.wwdablu.guidededittextext.extensions.dipToPixel
+import com.wwdablu.guidededittextext.extensions.reviewFrom
+import com.wwdablu.guidededittextext.extensions.setPropertiesByState
+import com.wwdablu.guidededittextext.model.RuleView
 import java.util.*
+
 
 class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCompat(context, attrs) {
 
@@ -19,6 +24,8 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
 
     private val ruleViewList = LinkedList<RuleView>()
     private var animate: Boolean = true
+    private var hideRuleOnSatisfied = true
+    private var guideTextSize: Float
 
     fun addRule(vararg rules: Rule) {
         for(rule: Rule in rules) {
@@ -31,6 +38,42 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
         for(rule: Rule in rules) {
             ruleViewList.add(RuleView(rule, createRuleView(rule)))
         }
+        notifyRuleSetChange()
+    }
+
+    fun notifyRuleChange(rule: Rule, state: RuleDefinition.State) {
+        if(rule.lastState != RuleDefinition.State.PendingValidation && state == RuleDefinition.State.PendingValidation) {
+            return
+        }
+
+        rule.lastState = state
+        val ruleView: RuleView? = ruleViewList.find {
+            it.rule == rule
+        }
+
+        ruleView?.let {
+            setRuleProperties(ruleView)
+        }
+    }
+
+    fun allRulesSatisfied() : Boolean {
+
+        for(ruleView: RuleView in ruleViewList) {
+            if(ruleView.rule.lastState != RuleDefinition.State.Satisfied) {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun hasPartiallySatisfiedRule() : Boolean {
+
+        for(ruleView: RuleView in ruleViewList) {
+            if(ruleView.rule.lastState == RuleDefinition.State.PartiallySatisfied) {
+                return true
+            }
+        }
+        return false
     }
 
     override fun onDetachedFromWindow() {
@@ -38,49 +81,49 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
         inputEditText.apply {
             removeTextChangedListener(textChangeLister)
         }
-        notifyRuleSetChange()
     }
 
-    private val textChangeLister = object: TextWatcher {
-
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            //
-        }
-
+    private val textChangeLister = object: TextChangeListener() {
         override fun onTextChanged(updatedText: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            for(ruleView in ruleViewList) {
-                if(ruleView.rule.notifyMode == IRule.Notify.Change) {
+            handleTextChange(updatedText.toString())
+        }
+    }
 
-                    when(ruleView.rule.ruleImpl.follows(updatedText.toString())) {
-                        IRule.State.Satisfied -> {
+    private fun handleTextChange(updatedText: String) {
 
-                            if(animate) {
-                                ruleView.view.fadeOutAndRemoveFrom(rulesContainer)
-                            } else {
-                                rulesContainer.removeView(ruleView.view)
-                            }
+        for(ruleView in ruleViewList) {
+            if(ruleView.rule.notifyMode == RuleDefinition.Notify.Change) {
 
-                            ruleView.viewIsAdded = false
-                        }
-                        IRule.State.Unsatisfied,
-                        IRule.State.PartiallySatisfied -> {
-                            if(!ruleView.viewIsAdded) {
-
-                                if(animate) {
-                                    ruleView.view.addAndFadeIn(rulesContainer)
-                                } else {
-                                    rulesContainer.addView(ruleView.view)
-                                }
-                                ruleView.viewIsAdded = true
-                            }
-                        }
-                    }
-                }
+                ruleView.rule.lastState = ruleView.rule.ruleImpl.follows(updatedText, ruleView.rule)
+                setRuleProperties(ruleView)
             }
         }
+    }
 
-        override fun afterTextChanged(p0: Editable?) {
-            //
+    private fun setRuleProperties(ruleView: RuleView) {
+        ruleView.view.setPropertiesByState(ruleView.rule.lastState, ruleView.rule)
+
+        when(ruleView.rule.lastState) {
+            RuleDefinition.State.Satisfied -> {
+
+                /* If the rule has been satisfied check if it needs to be hidden or
+                 * should it continue to be displayed
+                 */
+                if(hideRuleOnSatisfied) {
+                    ruleView.view.reviewFrom(rulesContainer, animate)
+                    ruleView.viewIsAdded = false
+                }
+            }
+
+            RuleDefinition.State.PendingValidation,
+            RuleDefinition.State.PartiallySatisfied,
+            RuleDefinition.State.Unsatisfied -> {
+                if(!ruleView.viewIsAdded) {
+
+                    ruleView.view.addTo(rulesContainer, animate)
+                    ruleView.viewIsAdded = true
+                }
+            }
         }
     }
 
@@ -91,12 +134,17 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
             R.styleable.GuidedEditTextExt, 0, 0).run {
 
             animate = getBoolean(R.styleable.GuidedEditTextExt_guideAnimate, true)
+            hideRuleOnSatisfied = getBoolean(R.styleable.GuidedEditTextExt_guideTextHideOnRuleSatisfied, true)
 
-            inputEditText.setBackgroundResource(getResourceId(
-                R.styleable.GuidedEditTextExt_inputBackground, R.drawable.rounded_corner))
+            guideTextSize = getDimension(R.styleable.GuidedEditTextExt_guideTextSize, 8f)
+
+                inputEditText.setBackgroundResource(getResourceId(
+                    R.styleable.GuidedEditTextExt_inputBackground, R.drawable.rounded_corner
+                ))
 
             rulesContainer.setBackgroundResource(getResourceId(
-                R.styleable.GuidedEditTextExt_guideBackgroundImage, R.drawable.guide_background))
+                R.styleable.GuidedEditTextExt_guideBackgroundImage, R.drawable.guide_background
+            ))
 
             this
         }
@@ -105,6 +153,19 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             addTextChangedListener(textChangeLister)
             id = generateViewId()
+            textSize = attributes.getDimension(R.styleable.GuidedEditTextExt_inputTextSize, 8f)
+
+            inputType = when(attributes.getInt(R.styleable.GuidedEditTextExt_inputType, 1)) {
+                InputType.Number.ordinal -> TYPE_CLASS_NUMBER
+                InputType.Text.ordinal -> TYPE_CLASS_TEXT
+                InputType.Password.ordinal -> {
+                    setSingleLine()
+                    transformationMethod = PasswordTransformationMethod.getInstance()
+                    TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                }
+                InputType.Phone.ordinal -> TYPE_CLASS_PHONE
+                else -> TYPE_CLASS_TEXT
+            }
         }
 
         rulesContainer.apply {
@@ -128,7 +189,7 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
         attributes.recycle()
     }
 
-    private fun createRuleView(rule: Rule) : View {
+    private fun createRuleView(rule: Rule) : AppCompatTextView {
 
         return AppCompatTextView(context).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -139,8 +200,9 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
                 0
             )
             id = generateViewId()
-            text = rule.ruleImpl.text(IRule.State.Unsatisfied)
-            setTextColor(rule.stateTextColorMap[IRule.State.Unsatisfied] ?: Color.RED)
+            text = rule.ruleImpl.text(RuleDefinition.State.Unsatisfied)
+            textSize = guideTextSize
+            setTextColor(rule.stateTextColorMap[RuleDefinition.State.Unsatisfied] ?: Color.RED)
         }
     }
 
@@ -152,9 +214,4 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
             }
         }
     }
-
-    private data class RuleView(
-        val rule: Rule,
-        val view: View,
-        var viewIsAdded: Boolean = true)
 }

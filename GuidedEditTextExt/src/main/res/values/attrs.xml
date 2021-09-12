@@ -3,17 +3,18 @@
 
     <declare-styleable name="GuidedEditTextExt">
 
-        <attr name="inputWidth" format="dimension"/>
-        <attr name="inputHeight" format="dimension"/>
         <attr name="inputType" format="enum">
             <enum name="number" value="0"/>
             <enum name="text" value="1"/>
             <enum name="password" value="2"/>
+            <enum name="phone" value="3"/>
         </attr>
+
         <attr name="inputTextSize" format="dimension"/>
         <attr name="inputBackground" format="reference"/>
 
-        <attr name="guideBackgroundColor" format="color"/>
+        <attr name="guideTextSize" format="dimension"/>
+        <attr name="guideTextHideOnRuleSatisfied" format="boolean"/>
         <attr name="guideBackgroundImage" format="reference"/>
         <attr name="guideAnimate" format="boolean"/>
 

@@ -1,3 +1,0 @@
-package com.wwdablu.guidededittextext
-
-import androidx.appcompat.widget.AppCompatEditText

@@ -2,40 +2,46 @@ package com.wwdablu.guidededittextext
 
 import android.graphics.Color
 import androidx.annotation.ColorInt
-import com.wwdablu.guidededittextext.IRule.Notify
-import com.wwdablu.guidededittextext.IRule.State
+import com.wwdablu.guidededittextext.RuleDefinition.Notify
+import com.wwdablu.guidededittextext.RuleDefinition.State
 
-class Rule private constructor(iRule: IRule) {
+class Rule(ruleDefinition: RuleDefinition) {
 
-    internal val ruleImpl = iRule
+    internal val ruleImpl = ruleDefinition
 
     internal var notifyMode = Notify.Finish
     internal var stateTextColorMap = HashMap<State, @ColorInt Int>()
+    internal var lastState: State = State.Unsatisfied
 
     init {
         stateTextColorMap.apply {
             put(State.Satisfied, Color.GREEN)
             put(State.Unsatisfied, Color.RED)
             put(State.PartiallySatisfied, Color.YELLOW)
+            put(State.PendingValidation, Color.DKGRAY)
         }
     }
 
-    class Builder(ruleImpl: IRule) {
+    fun setNotifyOn(notify: Notify) : Rule {
+        notifyMode = notify
+        return this
+    }
 
-        private val rule: Rule = Rule(ruleImpl)
+    fun setStateText(state: State, @ColorInt textColor: Int) : Rule {
+        stateTextColorMap[state] = textColor
+        return this
+    }
 
-        fun setNotifyOn(notify: Notify) : Builder {
-            rule.notifyMode = notify
-            return this
-        }
+    companion object {
 
-        fun setStateText(state: State, @ColorInt textColor: Int) : Builder {
-            rule.stateTextColorMap[state] = textColor
-            return this
-        }
+        fun similar(rule: Rule, ruleDefinition: RuleDefinition) : Rule {
+            return Rule(ruleDefinition).apply {
+                for(state: State in rule.stateTextColorMap.keys) {
+                    stateTextColorMap[state] = rule.stateTextColorMap[state]!!
+                }
 
-        fun build() : Rule {
-            return rule
+                notifyMode = rule.notifyMode
+            }
         }
     }
 }
