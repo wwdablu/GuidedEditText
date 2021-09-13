@@ -4,14 +4,19 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import com.wwdablu.guidededittextext.RuleDefinition.Notify
 import com.wwdablu.guidededittextext.RuleDefinition.State
+import kotlinx.coroutines.Job
+import java.util.concurrent.atomic.AtomicBoolean
 
 class Rule(ruleDefinition: RuleDefinition) {
 
     internal val ruleImpl = ruleDefinition
 
-    internal var notifyMode = Notify.Finish
+    internal var notifyMode = Notify.Debounce
+    internal var notifyAfter: Long = 600
     internal var stateTextColorMap = HashMap<State, @ColorInt Int>()
-    internal var lastState: State = State.Unsatisfied
+    internal var state: State = State.Unsatisfied
+
+    internal lateinit var debounceJob: Job
 
     init {
         stateTextColorMap.apply {
@@ -22,14 +27,19 @@ class Rule(ruleDefinition: RuleDefinition) {
         }
     }
 
-    fun setNotifyOn(notify: Notify) : Rule {
+    fun setNotifyOn(notify: Notify, notifyAfter: Long = 600) : Rule {
         notifyMode = notify
+        this.notifyAfter = notifyAfter
         return this
     }
 
     fun setStateText(state: State, @ColorInt textColor: Int) : Rule {
         stateTextColorMap[state] = textColor
         return this
+    }
+
+    internal fun isDebouncing() : Boolean {
+        return this::debounceJob.isInitialized && debounceJob.isActive
     }
 
     companion object {
@@ -41,6 +51,7 @@ class Rule(ruleDefinition: RuleDefinition) {
                 }
 
                 notifyMode = rule.notifyMode
+                notifyAfter = rule.notifyAfter
             }
         }
     }

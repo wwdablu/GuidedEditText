@@ -15,25 +15,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
 
+        val userNameMinimumLengthRule = Rule(UserNameMinimumLength())
+            .setNotifyOn(RuleDefinition.Notify.Debounce, 3000)
+
+        mBinding.textInputField.addRule(userNameMinimumLengthRule)
+
         setContentView(mBinding.root)
     }
 
-    inner class RuleDefinitionMinimumLength : RuleDefinition {
+    inner class UserNameMinimumLength : RuleDefinition {
         override fun follows(input: String, rule: Rule): RuleDefinition.State {
-            return when(input.trim().length) {
-                in 0..5 -> RuleDefinition.State.Unsatisfied
-                in 5..7 -> RuleDefinition.State.PartiallySatisfied
-                else -> RuleDefinition.State.Satisfied
-            }
+            return if(input.trim().length <= 7)
+                RuleDefinition.State.Unsatisfied
+            else
+                RuleDefinition.State.Satisfied
         }
 
         override fun text(state: RuleDefinition.State): SpannableString {
-            return when(state) {
-                RuleDefinition.State.Satisfied -> SpannableString("Very good!")
-                RuleDefinition.State.Unsatisfied -> SpannableString("Minimum length needed is 8")
-                RuleDefinition.State.PartiallySatisfied -> SpannableString("Weak, not accepted")
-                RuleDefinition.State.PendingValidation -> SpannableString("Waiting...")
-            }
+            return if(state == RuleDefinition.State.Satisfied)
+                SpannableString("Username is acceptable")
+            else
+                SpannableString("Username must be of 8 characters")
         }
     }
 }

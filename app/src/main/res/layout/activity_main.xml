@@ -17,7 +17,7 @@
 
     <com.wwdablu.guidededittextext.GuidedEditTextExt
         android:id="@+id/text_input_field"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
@@ -27,8 +27,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
+        app:inputType="text"
+        app:inputTextSize="8sp"
         app:guideAnimate="false"
-        app:guideTextHideOnRuleSatisfied="false"
+        app:guideTextSize="6sp"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -41,7 +43,7 @@
 
     <com.wwdablu.guidededittextext.GuidedEditTextExt
         android:id="@+id/password_input_field"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
@@ -54,11 +56,8 @@
         app:inputBackground="@drawable/rounded_corner"
         app:inputTextSize="8sp"
         app:inputType="password"
-
-        app:guideAnimate="true"
-        app:guideTextHideOnRuleSatisfied="true"
+        app:guideAnimate="false"
         app:guideTextSize="6sp"
-        app:guideBackgroundImage="@drawable/guide_background_sample"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -71,7 +70,7 @@
 
     <com.wwdablu.guidededittextext.GuidedEditTextExt
         android:id="@+id/phone_input_field"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
@@ -84,11 +83,8 @@
         app:inputBackground="@drawable/rounded_corner"
         app:inputTextSize="8sp"
         app:inputType="phone"
-
-        app:guideAnimate="true"
-        app:guideTextHideOnRuleSatisfied="true"
+        app:guideAnimate="false"
         app:guideTextSize="6sp"
-        app:guideBackgroundImage="@drawable/guide_background_sample"
         />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

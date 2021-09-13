@@ -13,7 +13,7 @@ interface RuleDefinition {
 
     enum class Notify {
         Change,
-        Finish
+        Debounce
     }
 
     /**

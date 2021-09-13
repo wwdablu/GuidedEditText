@@ -14,6 +14,7 @@ import com.wwdablu.guidededittextext.extensions.dipToPixel
 import com.wwdablu.guidededittextext.extensions.reviewFrom
 import com.wwdablu.guidededittextext.extensions.setPropertiesByState
 import com.wwdablu.guidededittextext.model.RuleView
+import kotlinx.coroutines.*
 import java.util.*
 
 
@@ -41,12 +42,20 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
         notifyRuleSetChange()
     }
 
+    /**
+     * Call when the current state of the Rule is {@link RuleDefinition.State.PendingValidation} to
+     * update the updated rule state. Should not be called on a rule whose state is not pending. A
+     * rule with PendingValidation state can be again set to PendingValidation
+     *
+     * @param rule Rule which was in pending validation
+     * @param state Updated state.
+     */
     fun notifyRuleChange(rule: Rule, state: RuleDefinition.State) {
-        if(rule.lastState != RuleDefinition.State.PendingValidation && state == RuleDefinition.State.PendingValidation) {
+        if(rule.state != RuleDefinition.State.PendingValidation && state == RuleDefinition.State.PendingValidation) {
             return
         }
 
-        rule.lastState = state
+        rule.state = state
         val ruleView: RuleView? = ruleViewList.find {
             it.rule == rule
         }
@@ -56,24 +65,36 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
         }
     }
 
+    /**
+     * Verifies if all the rules have been satisfied, i.e they are in @{RuleDefinition.State.Satisfied}
+     * state.
+     *
+     * @return True is all the rules have been satisfied.
+     */
     fun allRulesSatisfied() : Boolean {
 
         for(ruleView: RuleView in ruleViewList) {
-            if(ruleView.rule.lastState != RuleDefinition.State.Satisfied) {
+            if(ruleView.rule.state != RuleDefinition.State.Satisfied) {
                 return false
             }
         }
         return true
     }
 
-    fun hasPartiallySatisfiedRule() : Boolean {
+    /**
+     * Returns list of rules which are unsatisfied.
+     *
+     * @return List of rules which are unsatisfied
+     */
+    fun getUnsatisfiedRules() : List<Rule> {
 
+        val list = LinkedList<Rule>()
         for(ruleView: RuleView in ruleViewList) {
-            if(ruleView.rule.lastState == RuleDefinition.State.PartiallySatisfied) {
-                return true
+            if(ruleView.rule.state == RuleDefinition.State.Unsatisfied) {
+                list.add(ruleView.rule)
             }
         }
-        return false
+        return list
     }
 
     override fun onDetachedFromWindow() {
@@ -84,6 +105,29 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
     }
 
     private val textChangeLister = object: TextChangeListener() {
+
+        override fun beforeTextChanged(updatedText: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            for(ruleView in ruleViewList) {
+                ruleView.apply {
+                    if(rule.notifyMode == RuleDefinition.Notify.Debounce) {
+
+                        if(rule.isDebouncing()) {
+                            rule.debounceJob.cancelChildren()
+                        }
+
+                        rule.debounceJob = CoroutineScope(Dispatchers.Main).launch {
+                            val beforeDebounce = inputEditText.editableText.toString()
+                            delay(rule.notifyAfter)
+                            if(inputEditText.editableText.toString().contentEquals(beforeDebounce) && isActive) {
+                                rule.state = rule.ruleImpl.follows(inputEditText.editableText.toString(), rule)
+                                setRuleProperties(ruleView)
+                            }
+                        }
+                    }
+                }
+            }
+        }
         override fun onTextChanged(updatedText: CharSequence?, p1: Int, p2: Int, p3: Int) {
             handleTextChange(updatedText.toString())
         }
@@ -92,18 +136,23 @@ class GuidedEditTextExt(context: Context, attrs: AttributeSet) : LinearLayoutCom
     private fun handleTextChange(updatedText: String) {
 
         for(ruleView in ruleViewList) {
-            if(ruleView.rule.notifyMode == RuleDefinition.Notify.Change) {
 
-                ruleView.rule.lastState = ruleView.rule.ruleImpl.follows(updatedText, ruleView.rule)
-                setRuleProperties(ruleView)
+            ruleView.apply {
+                when(rule.notifyMode) {
+
+                    RuleDefinition.Notify.Change -> {
+                        rule.state = rule.ruleImpl.follows(updatedText, rule)
+                        setRuleProperties(this)
+                    }
+                }
             }
         }
     }
 
     private fun setRuleProperties(ruleView: RuleView) {
-        ruleView.view.setPropertiesByState(ruleView.rule.lastState, ruleView.rule)
+        ruleView.view.setPropertiesByState(ruleView.rule.state, ruleView.rule)
 
-        when(ruleView.rule.lastState) {
+        when(ruleView.rule.state) {
             RuleDefinition.State.Satisfied -> {
 
                 /* If the rule has been satisfied check if it needs to be hidden or
