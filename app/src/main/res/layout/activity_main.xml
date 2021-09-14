@@ -15,7 +15,7 @@
         android:layout_marginStart="16dp"
         />
 
-    <com.wwdablu.guidededittextext.GuidedEditTextExt
+    <com.wwdablu.guidededittext.GuidedEditText
         android:id="@+id/text_input_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,62 +29,62 @@
 
         app:inputType="text"
         app:inputTextSize="8sp"
-        app:guideAnimate="false"
+        app:guideAnimate="true"
         app:guideTextSize="6sp"
         />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Password Input Field"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        />
+<!--    <androidx.appcompat.widget.AppCompatTextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Password Input Field"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        />-->
 
-    <com.wwdablu.guidededittextext.GuidedEditTextExt
-        android:id="@+id/password_input_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+<!--    <com.wwdablu.guidededittextext.GuidedEditTextExt-->
+<!--        android:id="@+id/password_input_field"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:textColor="@color/black"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
 
-        app:inputBackground="@drawable/rounded_corner"
-        app:inputTextSize="8sp"
-        app:inputType="password"
-        app:guideAnimate="false"
-        app:guideTextSize="6sp"
-        />
+<!--        app:inputBackground="@drawable/rounded_corner"-->
+<!--        app:inputTextSize="8sp"-->
+<!--        app:inputType="password"-->
+<!--        app:guideAnimate="false"-->
+<!--        app:guideTextSize="6sp"-->
+<!--        />-->
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Phone Input Field"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        />
+<!--    <androidx.appcompat.widget.AppCompatTextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Phone Input Field"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        />-->
 
-    <com.wwdablu.guidededittextext.GuidedEditTextExt
-        android:id="@+id/phone_input_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+<!--    <com.wwdablu.guidededittextext.GuidedEditTextExt-->
+<!--        android:id="@+id/phone_input_field"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:textColor="@color/black"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
 
-        app:inputBackground="@drawable/rounded_corner"
-        app:inputTextSize="8sp"
-        app:inputType="phone"
-        app:guideAnimate="false"
-        app:guideTextSize="6sp"
-        />
+<!--        app:inputBackground="@drawable/rounded_corner"-->
+<!--        app:inputTextSize="8sp"-->
+<!--        app:inputType="phone"-->
+<!--        app:guideAnimate="false"-->
+<!--        app:guideTextSize="6sp"-->
+<!--        />-->
 
 </androidx.appcompat.widget.LinearLayoutCompat>
