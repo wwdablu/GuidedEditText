@@ -3,11 +3,12 @@ package com.wwdablu.guidededittext.extensions
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.util.Log
 import android.view.ViewGroup
-import androidx.appcompat.widget.LinearLayoutCompat
+import com.wwdablu.guidededittext.customui.RuleLinearLayout
 
 
-fun LinearLayoutCompat.hide(onHidden: () -> Unit) {
+internal fun RuleLinearLayout.hide(onHidden: () -> Unit) {
     val anim = ValueAnimator.ofInt(measuredHeight, 0)
     anim.addUpdateListener { valueAnimator ->
         val value = valueAnimator.animatedValue as Int
@@ -17,6 +18,7 @@ fun LinearLayoutCompat.hide(onHidden: () -> Unit) {
     }
     anim.addListener(object: AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator?) {
+            Log.e("App", "onAnimationEnd has been called")
             onHidden()
         }
     })
@@ -24,7 +26,7 @@ fun LinearLayoutCompat.hide(onHidden: () -> Unit) {
     anim.start()
 }
 
-fun LinearLayoutCompat.show(onHidden: () -> Unit) {
+internal fun RuleLinearLayout.show(onHidden: () -> Unit) {
     val llView = this
     val anim = ValueAnimator.ofInt(0, 100)
     anim.addUpdateListener { valueAnimator ->
@@ -36,10 +38,7 @@ fun LinearLayoutCompat.show(onHidden: () -> Unit) {
     anim.addListener(object: AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator?) {
             llView.apply {
-                layoutParams = LinearLayoutCompat.LayoutParams(
-                    LinearLayoutCompat.LayoutParams.MATCH_PARENT,
-                    LinearLayoutCompat.LayoutParams.WRAP_CONTENT
-                )
+                layoutParams = llView.getActualLayoutParam()
             }
             onHidden()
         }

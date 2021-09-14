@@ -10,7 +10,11 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import com.wwdablu.guidededittext.abstracts.TextChangeListener
-import com.wwdablu.guidededittext.extensions.*
+import com.wwdablu.guidededittext.customui.RuleLinearLayout
+import com.wwdablu.guidededittext.extensions.dipToPixel
+import com.wwdablu.guidededittext.extensions.hide
+import com.wwdablu.guidededittext.extensions.setPropertiesByState
+import com.wwdablu.guidededittext.extensions.show
 import com.wwdablu.guidededittext.model.RuleView
 import kotlinx.coroutines.*
 import java.util.*
@@ -19,7 +23,7 @@ import java.util.*
 class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat(context, attrs) {
 
     private val inputEditText: AppCompatEditText = AppCompatEditText(context)
-    private val rulesContainer: LinearLayoutCompat = LinearLayoutCompat(context)
+    private val rulesContainer: RuleLinearLayout = RuleLinearLayout(context)
 
     private val ruleViewList = LinkedList<RuleView>()
     private var animate: Boolean = true
@@ -95,6 +99,15 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
         return list
     }
 
+    /**
+     * Provides the text that has been entered by the user.
+     *
+     * @return String entered by the user
+     */
+    fun getText() : String {
+        return inputEditText.editableText.toString()
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         inputEditText.apply {
@@ -120,6 +133,7 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
                             if(inputEditText.editableText.toString().contentEquals(beforeDebounce) && isActive) {
                                 rule.state = rule.ruleImpl.follows(inputEditText.editableText.toString(), rule)
                                 setRuleProperties(ruleView)
+                                hideRuleContainerIfApplicable()
                             }
                         }
                     }
@@ -139,6 +153,7 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
                 if(rule.notifyMode == RuleDefinition.Notify.Change) {
                     rule.state = rule.ruleImpl.follows(updatedText, rule)
                     setRuleProperties(this)
+                    hideRuleContainerIfApplicable()
                 }
             }
         }
@@ -179,11 +194,11 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
             it.viewIsAdded
         }.size
 
-        if(visibleViewCount == 0) {
+        if(visibleViewCount == 0 && rulesContainer.visibility == VISIBLE) {
             rulesContainer.hide {
                 rulesContainer.visibility = GONE
             }
-        } else if (rulesContainer.visibility == GONE) {
+        } else if (visibleViewCount != 0 && rulesContainer.visibility == GONE) {
             rulesContainer.visibility = VISIBLE
             rulesContainer.show {
                 //
@@ -229,9 +244,7 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
         }
 
         rulesContainer.apply {
-            val lpConfig = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            lpConfig.setMargins(dipToPixel(8f).toInt(), 0, dipToPixel(8f).toInt(), 0)
-            layoutParams = lpConfig
+            layoutParams = getActualLayoutParam()
             layoutTransition = LayoutTransition()
 
             setPadding(dipToPixel(4f).toInt(), dipToPixel(8f).toInt(),
@@ -254,7 +267,6 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
                 dipToPixel(8f).toInt(), 0, dipToPixel(8f).toInt(), 0
             )
             id = generateViewId()
-            text = rule.ruleImpl.text(RuleDefinition.State.Unsatisfied)
             textSize = guideTextSize
             setTextColor(rule.stateTextColorMap[RuleDefinition.State.Unsatisfied] ?: Color.RED)
         }
@@ -264,7 +276,20 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
         rulesContainer.apply {
             removeAllViews()
             for(rulePair in ruleViewList) {
-                addView(rulePair.view)
+
+                rulePair.run {
+
+                    //Probe to see if the rule is followed. If so, then we will not add to the view
+                    val state = rule.ruleImpl.follows(inputEditText.editableText.toString(), rulePair.rule)
+                    rule.state = state
+                    view.text = rule.ruleImpl.text(state)
+                    setRuleProperties(this)
+
+                    //If rule is unsatisfied or explicitly asked to show satisfied rules, then add
+                    if(state == RuleDefinition.State.Unsatisfied || !hideRuleOnSatisfied) {
+                        rulesContainer.addView(rulePair.view)
+                    }
+                }
             }
         }
 
