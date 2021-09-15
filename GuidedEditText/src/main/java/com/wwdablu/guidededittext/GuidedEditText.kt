@@ -3,12 +3,10 @@ package com.wwdablu.guidededittext
 import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.Color
-import android.text.InputType.*
-import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatEditText
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
 import com.wwdablu.guidededittext.abstracts.TextChangeListener
 import com.wwdablu.guidededittext.customui.RuleLinearLayout
 import com.wwdablu.guidededittext.extensions.dipToPixel
@@ -20,16 +18,21 @@ import kotlinx.coroutines.*
 import java.util.*
 
 
-class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat(context, attrs) {
+class GuidedEditText(context: Context, attrs: AttributeSet) : RuleLinearLayout(context, attrs) {
 
-    private val inputEditText: AppCompatEditText = AppCompatEditText(context)
-    private val rulesContainer: RuleLinearLayout = RuleLinearLayout(context)
+    private val rulesContainer = this
+    private var hostEditTextResId = 0
 
     private val ruleViewList = LinkedList<RuleView>()
     private var animate: Boolean = true
     private var hideRuleOnSatisfied = true
     private var guideTextSize: Float
 
+    /**
+     * Add a rule that will be applicable
+     *
+     * @param rules varags of @{link Rule}
+     */
     fun addRule(vararg rules: Rule) {
         for(rule: Rule in rules) {
             ruleViewList.add(RuleView(rule, createRuleView(rule)))
@@ -37,6 +40,11 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
         notifyRuleSetChange()
     }
 
+    /**
+     * Add a list of rules that will be applicable.
+     *
+     * @param rules List of rules
+     */
     fun addRule(rules: List<Rule>) {
         for(rule: Rule in rules) {
             ruleViewList.add(RuleView(rule, createRuleView(rule)))
@@ -97,15 +105,6 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
             }
         }
         return list
-    }
-
-    /**
-     * Provides the text that has been entered by the user.
-     *
-     * @return String entered by the user
-     */
-    fun getText() : String {
-        return inputEditText.editableText.toString()
     }
 
     override fun onDetachedFromWindow() {
@@ -207,6 +206,9 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
     }
 
     init {
+        //layoutParams = getActualLayoutParam()
+        layoutTransition = LayoutTransition()
+
         orientation = VERTICAL
 
         val attributes = context.theme.obtainStyledAttributes(attrs,
@@ -215,47 +217,27 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
             animate = getBoolean(R.styleable.GuidedEditTextExt_guideAnimate, true)
             hideRuleOnSatisfied = getBoolean(R.styleable.GuidedEditTextExt_guideTextHideOnRuleSatisfied, true)
 
-            guideTextSize = getDimension(R.styleable.GuidedEditTextExt_guideTextSize, 8f)
+            hostEditTextResId = getResourceId(R.styleable.GuidedEditTextExt_guideLinkedWith, 0)
 
-                inputEditText.setBackgroundResource(getResourceId(
-                    R.styleable.GuidedEditTextExt_inputBackground, R.drawable.rounded_corner))
+            guideTextSize = getDimension(R.styleable.GuidedEditTextExt_guideTextSize, 8f)
 
             rulesContainer.setBackgroundResource(getResourceId(
                 R.styleable.GuidedEditTextExt_guideBackgroundImage, R.drawable.guide_background))
         }
 
-        inputEditText.apply {
-            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            addTextChangedListener(textChangeLister)
-            id = generateViewId()
-            textSize = attributes.getDimension(R.styleable.GuidedEditTextExt_inputTextSize, 8f)
+        viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                viewTreeObserver.removeOnPreDrawListener(this)
+                inputEditText = (parent as ViewGroup).findViewById(hostEditTextResId)
+                inputEditText.addTextChangedListener(textChangeLister)
 
-            inputType = when(attributes.getInt(R.styleable.GuidedEditTextExt_inputType, 1)) {
-                InputType.Number.ordinal -> TYPE_CLASS_NUMBER
-                InputType.Text.ordinal -> TYPE_CLASS_TEXT
-                InputType.Password.ordinal -> {
-                    setSingleLine()
-                    transformationMethod = PasswordTransformationMethod.getInstance()
-                    TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                }
-                InputType.Phone.ordinal -> TYPE_CLASS_PHONE
-                else -> TYPE_CLASS_TEXT
+                rulesContainer.layoutParams = getActualLayoutParam()
+
+                notifyRuleSetChange()
+                return true
             }
-        }
+        })
 
-        rulesContainer.apply {
-            layoutParams = getActualLayoutParam()
-            layoutTransition = LayoutTransition()
-
-            setPadding(dipToPixel(4f).toInt(), dipToPixel(8f).toInt(),
-                dipToPixel(4f).toInt(), dipToPixel(8f).toInt())
-
-            orientation = VERTICAL
-            id = generateViewId()
-        }
-
-        addView(inputEditText)
-        addView(rulesContainer)
         attributes.recycle()
     }
 
@@ -273,6 +255,12 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : LinearLayoutCompat
     }
 
     private fun notifyRuleSetChange() {
+
+        //Proceed only in the underlying edit text view has been created
+        if(!hasEditText()) {
+            return
+        }
+
         rulesContainer.apply {
             removeAllViews()
             for(rulePair in ruleViewList) {

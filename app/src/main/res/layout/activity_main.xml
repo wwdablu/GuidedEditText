@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_username_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Username"
@@ -15,11 +16,21 @@
         android:layout_marginStart="16dp"
         />
 
+    <EditText
+        android:id="@+id/et_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        />
+
     <com.wwdablu.guidededittext.GuidedEditText
-        android:id="@+id/text_input_field"
+        android:id="@+id/get_user_name_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:textColor="@color/black"
@@ -27,12 +38,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        app:inputType="text"
-        app:inputTextSize="8sp"
         app:guideAnimate="true"
         app:guideTextSize="6sp"
-        app:inputBackground="@drawable/rounded_corner"
         app:guideBackgroundImage="@drawable/guide_background_sample"
+        app:guideLinkedWith="@id/et_user_name"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -41,6 +50,18 @@
         android:text="Password"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        />
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:inputType="textPassword"
         />
 
     <com.wwdablu.guidededittext.GuidedEditText
@@ -55,12 +76,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        app:inputType="password"
-        app:inputTextSize="8sp"
         app:guideAnimate="true"
         app:guideTextSize="6sp"
-        app:inputBackground="@drawable/rounded_corner"
         app:guideBackgroundImage="@drawable/guide_background_sample"
+        app:guideLinkedWith="@id/et_password"
         />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

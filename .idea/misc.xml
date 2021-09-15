@@ -9,7 +9,7 @@
         <entry key="app/src/main/res/drawable/guide_background.xml" value="0.24166666666666667" />
         <entry key="app/src/main/res/drawable/guide_background_sample.xml" value="0.3990740740740741" />
         <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.24166666666666667" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3401268115942029" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
       </map>
     </option>
   </component>
