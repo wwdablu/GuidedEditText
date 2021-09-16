@@ -1,8 +1,23 @@
 # GuidedEditText
-UI component that can be attached to an EditText view which shows guides(rules) which are needed to be satisfied to have a proper entry.
+UI component that can be attached to an EditText view which shows guides(rules) which are needed to be satisfied to have a proper entry.  
+  
+[![](https://jitpack.io/v/wwdablu/GuidedEditText.svg)](https://jitpack.io/#wwdablu/GuidedEditText)  
+  
+**__Gradle Declaration__**:  
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.wwdablu:GuidedEditText:0.0.4'
+}
+```
 
 **__Usage__**:  
-//Jitpack statement goes here  
 
 Inside the layout XML an entry for GuidedEditText needs to be created. This control needs to be linked with a EditText view. Internally any text change in the EditText view will trigger the implementation logic (or Rules) provided. It needs to be taken care that the EditText and the GuidedEditText should be present in the same viewgroup.  
 
@@ -72,3 +87,6 @@ Once this is done, finally the rule is required to be added to the GuidedEditTex
 ```
 mBinding.guidedEditText.addRule(userNameIsEmail)
 ```  
+
+**__Sample__**:  
+![alt text](https://github.com/wwdablu/GuidedEditText/blob/master/sample/guidededitext_sample.gif)
