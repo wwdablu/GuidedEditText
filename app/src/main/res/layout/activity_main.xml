@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- LinearLayout -->
+<!--
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,7 +19,7 @@
         />
 
     <EditText
-        android:id="@+id/et_user_name"
+        android:id="@+id/et_username"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:background="@drawable/rounded_corner"
@@ -28,11 +30,11 @@
         />
 
     <com.wwdablu.guidededittext.GuidedEditText
-        android:id="@+id/get_user_name_input"
+        android:id="@+id/guide_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +43,7 @@
         app:guideAnimate="true"
         app:guideTextSize="6sp"
         app:guideBackgroundImage="@drawable/guide_background_sample"
-        app:guideLinkedWith="@id/et_user_name"
+        app:guideLinkedWith="@id/et_username"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -65,12 +67,11 @@
         />
 
     <com.wwdablu.guidededittext.GuidedEditText
-        android:id="@+id/password_input_field"
+        android:id="@+id/guide_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,3 +84,178 @@
         />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
+-->
+
+<!-- ConstraintLayout -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_start"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="16dp"
+        android:layout_marginStart="8dp"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_top"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="16dp"
+        android:layout_marginStart="8dp"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_end"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="16dp"
+        android:layout_marginStart="8dp"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_bottom"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="20dp"
+        android:layout_marginStart="8dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_username"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp"
+        android:background="@drawable/rounded_corner"
+        app:layout_constraintStart_toEndOf="@id/gl_start"
+        app:layout_constraintEnd_toStartOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/gl_top"
+        />
+
+    <com.wwdablu.guidededittext.GuidedEditText
+        android:id="@+id/guide_username"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/gl_start"
+        app:layout_constraintEnd_toStartOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/et_username"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:guideLinkedWith="@id/et_username"
+        app:guideTextSize="6sp"
+        app:guideBackgroundImage="@drawable/guide_background_sample"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_corner"
+        app:layout_constraintStart_toEndOf="@id/gl_start"
+        app:layout_constraintEnd_toStartOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/guide_username"
+        />
+
+    <com.wwdablu.guidededittext.GuidedEditText
+        android:id="@+id/guide_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/gl_start"
+        app:layout_constraintEnd_toStartOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/et_password"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:guideLinkedWith="@id/et_password"
+        app:guideTextSize="6sp"
+        app:guideBackgroundImage="@drawable/guide_background_sample"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!-- RelativeLayout -->
+<!--
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:textSize="16sp"
+        android:background="@drawable/rounded_corner"
+        />
+
+    <com.wwdablu.guidededittext.GuidedEditText
+        android:id="@+id/guide_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_below="@id/et_username"
+        app:guideLinkedWith="@id/et_username"
+        app:guideTextSize="6sp"
+        app:guideBackgroundImage="@drawable/guide_background_sample"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_below="@id/guide_username"
+        android:background="@drawable/rounded_corner"
+        />
+
+    <com.wwdablu.guidededittext.GuidedEditText
+        android:id="@+id/guide_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/et_password"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_below="@id/et_password"
+        app:guideLinkedWith="@id/et_password"
+        app:guideTextSize="6sp"
+        app:guideBackgroundImage="@drawable/guide_background_sample"
+        />
+
+</RelativeLayout>
+-->
