@@ -15,8 +15,8 @@ class MainActivity : AppCompatActivity() {
 
         mBinding = ActivityMainBinding.inflate(layoutInflater)
 
-        mBinding.getUserNameInput.addRule(UsernameRules.getRules())
-        mBinding.passwordInputField.addRule(PasswordRules.getRules())
+        mBinding.guideUsername.addRule(UsernameRules.getRules())
+        mBinding.guidePassword.addRule(PasswordRules.getRules())
 
         setContentView(mBinding.root)
     }

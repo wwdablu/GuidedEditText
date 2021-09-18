@@ -206,7 +206,7 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : RuleLinearLayout(c
     }
 
     init {
-        //layoutParams = getActualLayoutParam()
+
         layoutTransition = LayoutTransition()
 
         orientation = VERTICAL
