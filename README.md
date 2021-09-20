@@ -13,7 +13,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.wwdablu:GuidedEditText:1.0.5'
+    implementation 'com.github.wwdablu:GuidedEditText:x.y.z'
 }
 ```
 
