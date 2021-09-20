@@ -1,12 +1,9 @@
 package com.wwdablu.guidededittextextsample
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.wwdablu.guidededittextextsample.databinding.ActivityMainBinding
-import com.wwdablu.guidededittextextsample.rules.PasswordRules
-import com.wwdablu.guidededittextextsample.rules.UsernameRules
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : MainActivityRules() {
 
     private lateinit var mBinding: ActivityMainBinding
 
@@ -15,8 +12,11 @@ class MainActivity : AppCompatActivity() {
 
         mBinding = ActivityMainBinding.inflate(layoutInflater)
 
-        mBinding.guideUsername.addRule(UsernameRules.getRules())
-        mBinding.guidePassword.addRule(PasswordRules.getRules())
+        guidedUsername = mBinding.guideUsername
+        guidedPassword = mBinding.guidePassword
+
+        mBinding.guideUsername.addRule(getUsernameRules())
+        mBinding.guidePassword.addRule(getPasswordRules())
 
         setContentView(mBinding.root)
     }

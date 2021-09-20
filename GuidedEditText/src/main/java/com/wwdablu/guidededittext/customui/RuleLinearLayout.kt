@@ -10,6 +10,7 @@ import com.wwdablu.guidededittext.extensions.dipToPixel
 open class RuleLinearLayout(context: Context, attrs: AttributeSet) : LinearLayoutCompat(context, attrs) {
 
     internal lateinit var inputEditText: AppCompatEditText
+    internal var isHidden: Boolean = false
 
     internal fun hasEditText() : Boolean {
         return this::inputEditText.isInitialized

@@ -4,6 +4,7 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.appcompat.widget.AppCompatTextView
@@ -173,7 +174,11 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : RuleLinearLayout(c
                 }
             }
 
-            RuleDefinition.State.PendingValidation,
+            RuleDefinition.State.PendingValidation -> {
+                //It will be handled by setPropertiesByState method. No need to do any additional
+                //task in here at the moment.
+            }
+
             RuleDefinition.State.PartiallySatisfied,
             RuleDefinition.State.Unsatisfied -> {
                 if(!ruleView.viewIsAdded) {
@@ -182,6 +187,8 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : RuleLinearLayout(c
                 }
             }
         }
+
+        hideRuleContainerIfApplicable()
     }
 
     /* If no rules are visible then do not display the rule container as it would just be an
@@ -193,12 +200,12 @@ class GuidedEditText(context: Context, attrs: AttributeSet) : RuleLinearLayout(c
             it.viewIsAdded
         }.size
 
-        if(visibleViewCount == 0 && rulesContainer.visibility == VISIBLE) {
+        if(visibleViewCount == 0 && !rulesContainer.isHidden) {
             rulesContainer.hide {
-                rulesContainer.visibility = GONE
+                isHidden = true
             }
-        } else if (visibleViewCount != 0 && rulesContainer.visibility == GONE) {
-            rulesContainer.visibility = VISIBLE
+        } else if (visibleViewCount != 0 && rulesContainer.isHidden) {
+            rulesContainer.isHidden = false
             rulesContainer.show {
                 //
             }
