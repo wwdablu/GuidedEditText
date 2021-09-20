@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../layout/custom_preview.xml" value="0.2520833333333333" />
         <entry key="GuidedEditText/src/main/res/drawable/guide_background.xml" value="0.3990740740740741" />
         <entry key="GuidedEditTextExt/src/main/res/drawable/guide_background.xml" value="0.4066666666666667" />
         <entry key="GuidedEditTextExt/src/main/res/drawable/rounded_corner.xml" value="0.23854166666666668" />
